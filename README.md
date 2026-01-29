@@ -11,12 +11,12 @@ O trabalho está organizado em quatro tarefas principais:
 - **Task 2**: Geração de um dataset sintético de imagens contendo múltiplos dígitos, com respetivas *bounding boxes* (ground truth), inspirado em ferramentas de deteção de objetos.
 - **Task 3**: Implementação de uma abordagem baseline de deteção baseada em *sliding window*, reutilizando o classificador treinado na Task 1.
 - **Task 4**: Abordagem melhorada de deteção, recorrendo ao re-treino da rede com uma classe adicional de *background*, permitindo reduzir falsos positivos e melhorar a robustez do sistema.
+  ---
 
 ## Task 1 — Classificação de Dígitos Manuscritos (MNIST)
 
 A Task 1 teve como objetivo o desenvolvimento, treino e avaliação de um classificador de dígitos manuscritos utilizando o dataset MNIST. Esta tarefa constitui a base de todo o projeto, uma vez que o modelo aqui treinado é posteriormente reutilizado e adaptado nas tarefas de deteção.
 
----
 
 ### Dataset
 
@@ -29,7 +29,6 @@ Foi utilizado o dataset **MNIST**, amplamente adotado como benchmark em problema
 
 O dataset é descarregado automaticamente através da biblioteca `torchvision`, não sendo incluído no repositório, o que garante a reprodutibilidade dos resultados.
 
----
 
 ### Arquitetura do Modelo
 
@@ -43,7 +42,6 @@ O classificador desenvolvido baseia-se numa **Rede Neuronal Convolucional (CNN)*
 
 Esta arquitetura foi escolhida de forma a equilibrar desempenho e custo computacional, permitindo uma boa generalização no dataset MNIST e servindo como classificador base para as tarefas seguintes.
 
----
 
 ### Treino
 
@@ -66,7 +64,6 @@ As curvas de treino mostram uma convergência estável, sem sinais de overfittin
 ## Loss ao longo das épocas
 ![Curva de Loss — Task 1](Resultados/training_curves_loss.png)
 
----
 
 ### Avaliação e Resultados
 
@@ -87,8 +84,6 @@ A avaliação do modelo foi realizada no conjunto de teste do MNIST, recorrendo 
 
 Os resultados obtidos demonstram uma elevada capacidade de generalização do classificador, com erros residuais maioritariamente associados a dígitos visualmente semelhantes.
 
----
-
 #### Matriz de Confusão
 
 A figura seguinte apresenta a matriz de confusão obtida no conjunto de teste do MNIST. Observa-se uma forte concentração dos valores na diagonal principal, indicando um elevado desempenho do classificador em todas as classes.
@@ -96,9 +91,4 @@ A figura seguinte apresenta a matriz de confusão obtida no conjunto de teste do
 
 
 Os resultados confirmam que o classificador apresenta desempenho robusto e generaliza bem para dados não vistos.
-Este modelo será reutilizado diretamente na Task 3, permitindo avaliar o impacto da ausência da classe fundo no problema de deteção por janela deslizante.
-
-
----
-
 O modelo treinado nesta tarefa é reutilizado diretamente na **Task 3** como classificador base e serve como ponto de partida conceptual para a abordagem melhorada desenvolvida na **Task 4**.
