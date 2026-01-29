@@ -56,6 +56,16 @@ O treino do modelo foi realizado com as seguintes configurações principais:
 
 Os principais hiperparâmetros, como número de épocas, *learning rate*, *batch size* e *dropout*, são configuráveis através de argumentos de linha de comandos.
 
+### Curvas de Treino
+
+As curvas de treino mostram uma convergência estável, sem sinais de overfitting significativo.
+
+## Accuracy ao longo das épocas
+![Curva de Accuracy — Task 1](Resultados/training_curves_acc.png)
+
+## Loss ao longo das épocas
+![Curva de Loss — Task 1](Resultados/training_curves_loss.png)
+
 ---
 
 ### Avaliação e Resultados
@@ -82,8 +92,12 @@ Os resultados obtidos demonstram uma elevada capacidade de generalização do cl
 #### Matriz de Confusão
 
 A figura seguinte apresenta a matriz de confusão obtida no conjunto de teste do MNIST. Observa-se uma forte concentração dos valores na diagonal principal, indicando um elevado desempenho do classificador em todas as classes.
+![Matriz de Confusão — Task 1](Resultados/confusion_matrix.png)
 
-![Matriz de Confusão — Task 1](assets/task1_confusion_matrix.png)
+
+Os resultados confirmam que o classificador apresenta desempenho robusto e generaliza bem para dados não vistos.
+Este modelo será reutilizado diretamente na Task 3, permitindo avaliar o impacto da ausência da classe fundo no problema de deteção por janela deslizante.
+
 
 ---
 
