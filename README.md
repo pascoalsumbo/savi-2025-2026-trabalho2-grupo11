@@ -93,3 +93,79 @@ A figura seguinte apresenta a matriz de confusão obtida no conjunto de teste do
 
 Os resultados confirmam que o classificador apresenta desempenho robusto e generaliza bem para dados não vistos.
 O modelo treinado nesta tarefa é reutilizado diretamente na **Task 3** como classificador base e serve como ponto de partida conceptual para a abordagem melhorada desenvolvida na **Task 4**.
+
+---
+##  Task 2 — Geração de Dataset Sintético para Deteção de Dígitos
+
+### Objetivo
+O objetivo da **Task 2** foi gerar um **dataset sintético de imagens maiores** contendo múltiplos dígitos MNIST posicionados aleatoriamente, inspirado na ferramenta *MNIST Object Detection*.  
+Este passo permite a transição de um problema de **classificação simples** para um problema mais realista de **deteção de objetos em cenas complexas**.
+
+### Descrição do Dataset Gerado
+Cada imagem sintética possui dimensão **128×128 pixels**, fundo negro, e contém **um ou vários dígitos MNIST** colocados em posições aleatórias.  
+Para cada imagem são gerados:
+- a imagem (`.png`);
+- ficheiros de anotações com **bounding boxes (ground truth)**;
+- divisão explícita em **conjunto de treino** e **conjunto de teste**.
+
+Foram geradas várias versões do dataset (`synth_vA` a `synth_vD`), com níveis crescentes de complexidade:
+- Versão A: 1 dígito por imagem, sem variação de escala
+
+- Versão B: 1 dígito por imagem, com variação de escala
+
+- Versão C: múltiplos dígitos por imagem (3 a 5), sem variação de escala
+
+- Versão D: múltiplos dígitos por imagem (3 a 5), com variação de escala
+
+
+### Visualização dos Mosaicos
+A figura seguinte apresenta exemplos de imagens sintéticas geradas, evidenciando múltiplos dígitos distribuídos espacialmente na mesma imagem.
+
+![Mosaico de imagens — synth_vD (train)](Resultados/mosaic_synth_vD_train.png)
+![Mosaico de imagens — synth_vD (test)](Resultados/mosaic_synth_vD_test.png)
+
+Estas visualizações confirmam a existência de cenários visualmente complexos e realistas para tarefas de deteção.
+
+
+### Distribuição de Classes
+A distribuição das classes foi analisada para garantir equilíbrio entre os dígitos no dataset sintético.
+
+![Distribuição de Classes — Train](Resultados/class_dist_synth_vD_train.png)
+![Distribuição de Classes — Test](Resultados/class_dist_synth_vD_test.png)
+
+Observa-se uma distribuição aproximadamente uniforme das classes 0–9, evitando enviesamentos no processo de treino.
+
+
+### Número de Dígitos por Imagem
+Foi analisado o número de dígitos presentes em cada imagem, permitindo caracterizar a complexidade das cenas.
+
+![Dígitos por Imagem — Train](Resultados/digits_per_image_synth_vD_train.png)
+![Dígitos por Imagem — Test](Resultados/digits_per_image_synth_vD_test.png)
+
+Estas estatísticas demonstram que as imagens contêm múltiplos objetos por cena, tornando o problema significativamente mais complexo do que o MNIST clássico.
+
+
+### Tamanho Médio dos Dígitos
+A variabilidade do tamanho dos dígitos foi analisada através da área das bounding boxes.
+
+![Tamanho dos Dígitos — Train](Resultados/digit_size_synth_vD_train.png)
+![Tamanho dos Dígitos — Test](Resultados/digit_size_synth_vD_test.png)
+
+Esta diversidade de escalas obriga os métodos de deteção a serem robustos a variações de dimensão e localização.
+
+### Análise Crítica
+A geração deste dataset constitui um passo fundamental no trabalho, pois:
+- introduz **contexto espacial**;
+- adiciona explicitamente o conceito de **fundo**;
+- cria condições realistas para avaliar métodos de deteção baseados em **janelas deslizantes** (Task 3);
+- prepara o treino de arquiteturas mais avançadas com classe *background* (Task 4).
+
+Embora inspirado na ferramenta MNIST-ObjectDetection, o dataset foi adaptado ao fluxo específico deste projeto, mantendo controlo total sobre os parâmetros de geração.
+A escala dos dígitos foi limitada a um intervalo entre 22×22 e 36×36 pixels, conforme sugerido no enunciado. Ao contrário da ferramenta MNIST-ObjectDetection original, onde é permitida alguma sobreposição controlada através de Intersection over Union (IoU), neste trabalho foi imposta a não sobreposição entre dígitos. Embora esta escolha torne o problema ligeiramente menos complexo do que cenários reais, ela permite uma análise mais controlada e adequada a um contexto didático.
+
+A **Task 2** permitiu criar um dataset sintético robusto e bem caracterizado, essencial para:
+- avaliar as limitações da deteção por *sliding window*;
+- justificar a necessidade de arquiteturas integradas mais eficientes.
+
+Este dataset constitui a base experimental para todas as tarefas subsequentes.
+
