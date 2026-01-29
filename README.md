@@ -217,4 +217,116 @@ Estas limitações motivam a adoção de uma estratégia de deteção mais robus
 A **Task 3** demonstra a aplicabilidade de uma abordagem clássica de deteção baseada em *sliding window*, evidenciando simultaneamente as suas limitações práticas.  
 Esta análise crítica serve de base para a introdução de um detetor melhorado na tarefa seguinte.
 
+---
+
+## Task 4 — Deteção Melhorada com Classe Fundo (*Background*)
+
+### Objetivo
+O objetivo da **Task 4** é desenvolver um sistema de deteção de dígitos mais eficiente e robusto, superando as limitações observadas na abordagem de **janela deslizante** da Task 3.  
+Para tal, é treinado um novo classificador capaz de distinguir explicitamente entre **dígitos (0–9)** e a classe adicional **fundo (*background*)**, permitindo uma deteção mais precisa e menos redundante.
+
+---
+
+### Metodologia
+Nesta tarefa, o problema de deteção é reformulado como um problema de **classificação multiclasse com 11 classes** (10 dígitos + fundo).
+
+A metodologia adotada consiste em:
+1. Extração de *patches* (28×28) a partir das imagens sintéticas geradas na Task 2  
+2. Rotulagem dos *patches* como:
+   - dígito (quando existe interseção significativa com uma *bounding box*)
+   - fundo (quando não existe dígito presente)
+3. Treino de uma nova **CNN** especificamente adaptada a este cenário
+4. Aplicação do modelo treinado em deteção, recorrendo a *sliding window* + classificação direta com classe fundo
+5. Aplicação opcional de **Non-Maximum Suppression (NMS)** para eliminar sobreposições residuais
+
+Esta abordagem permite reduzir significativamente o número de falsas deteções e a redundância observada na Task 3.
+
+---
+
+### Arquitetura do Modelo
+Foi implementada uma rede neuronal convolucional dedicada, com as seguintes características:
+- Entrada: imagens 28×28 em escala de cinzentos  
+- Saída: 11 classes (0–9 + background)  
+- Função de perda: *Cross-Entropy Loss*  
+- Otimizador: Adam  
+
+O modelo foi treinado com dados sintéticos derivados da Task 2, incluindo exemplos representativos da classe fundo.
+
+
+### Resultados de Treino
+O modelo apresentou uma **rápida convergência** e **elevada precisão no conjunto de validação**, demonstrando boa capacidade de generalização.
+
+Exemplo de resultados:
+- Accuracy de validação ≈ 99%
+- Perda reduzida e estável ao longo das épocas
+
+
+### Resultados de Deteção
+A figura seguinte apresenta um exemplo de deteção obtido com o modelo melhorado, após aplicação de *sliding window* e **NMS**.
+
+![Deteção Melhorada — Task 4](Resultados/det_task4_synth_vA_test_000000_w28_s4_p0.90_nms0.30.png)
+
+Comparativamente à Task 3, observa-se:
+- Redução significativa do número de deteções falsas  
+- Melhor alinhamento das *bounding boxes* com os dígitos reais  
+- Menor redundância e sobreposição  
+
+
+### Discussão
+A introdução explícita da classe **fundo** permite ao modelo rejeitar regiões irrelevantes da imagem, algo que não era possível na Task 3.  
+Esta reformulação conduz a:
+- Melhor precisão global  
+- Redução do custo computacional efetivo  
+- Melhor escalabilidade para cenas mais complexas  
+
+A combinação de **classificação com classe fundo** e **NMS** resulta num sistema de deteção substancialmente mais eficiente e adequado a cenários reais.
+
+### Comparação entre Task 3 e Task 4
+
+A tabela seguinte apresenta uma comparação direta entre a abordagem de deteção por **janela deslizante** (Task 3) e a estratégia de **deteção melhorada com classe fundo** (Task 4).
+
+| Critério | Task 3 — Sliding Window | Task 4 — Deteção Melhorada |
+|--------|-------------------------|----------------------------|
+| Tipo de abordagem | Janela deslizante + classificador MNIST | Classificador com classe fundo |
+| Classes consideradas | Dígitos (0–9) | Dígitos (0–9) + fundo |
+| Tratamento do fundo | Não explícito | Explícito |
+| Número de deteções | Elevado | Reduzido |
+| Falsos positivos | Frequentes | Significativamente reduzidos |
+| Sobreposição de caixas | Elevada | Baixa (com NMS) |
+| Necessidade de NMS | Elevada | Opcional |
+| Precisão visual | Moderada | Elevada |
+| Eficiência computacional | Baixa | Superior |
+| Escalabilidade | Limitada | Melhor |
+| Adequação a cenários reais | Fraca | Boa |
+
+Esta comparação evidencia que, apesar de funcional, a abordagem da Task 3 apresenta limitações significativas. A estratégia adotada na Task 4 resolve essas limitações através da introdução da classe fundo, resultando num sistema de deteção mais preciso, eficiente e robusto. Esta estratégia resolve as principais limitações identificadas na Task 3, concluindo o pipeline completo de deteção de dígitos iniciado na Task 1.
+
+## Dificuldades e Soluções Encontradas
+
+Ao longo do desenvolvimento deste projeto surgiram vários desafios técnicos e conceptuais, cuja resolução foi fundamental para a evolução progressiva das diferentes tarefas.
+
+### Geração do Dataset Sintético (Task 2)
+Um dos principais desafios iniciais foi a geração de imagens sintéticas realistas contendo múltiplos dígitos sem sobreposição excessiva. A colocação aleatória dos dígitos conduzia frequentemente a *bounding boxes* inválidas ou demasiado próximas, o que dificultava a deteção posterior.
+
+Este problema foi resolvido através da introdução de regras adicionais durante a geração do dataset, nomeadamente restrições de distância mínima entre dígitos e controlo do número de objetos por imagem. Adicionalmente, foi realizada uma análise estatística detalhada do dataset gerado, permitindo validar o equilíbrio das classes e a variabilidade geométrica das *bounding boxes*.
+
+### Deteção por Janela Deslizante (Task 3)
+Na Task 3, a principal dificuldade esteve relacionada com o elevado número de falsas deteções produzidas pela abordagem de janela deslizante. Como o classificador utilizado não incluía uma classe para o fundo, todas as janelas eram forçadas a corresponder a um dígito, mesmo quando continham apenas fundo.
+
+Para mitigar este problema, foram introduzidos critérios adicionais de filtragem baseados na probabilidade máxima do *softmax* e na entropia da distribuição de classes. Embora estas estratégias tenham reduzido parcialmente o número de deteções inválidas, verificou-se que a abordagem continuava a apresentar limitações significativas, nomeadamente elevada redundância e custo computacional.
+
+
+### Reformulação do Problema de Deteção (Task 4)
+A principal dificuldade na Task 4 consistiu em reformular corretamente o problema de deteção, de modo a superar as limitações identificadas na Task 3. A inclusão explícita da classe *background* exigiu a criação de um novo dataset de *patches*, bem como a adaptação da arquitetura do modelo para suportar 11 classes.
+
+Este desafio foi resolvido através da extração sistemática de *patches* rotulados como dígito ou fundo a partir do dataset sintético, permitindo treinar um classificador mais robusto. A nova abordagem resultou numa redução significativa de falsas deteções e numa melhoria clara da qualidade visual dos resultados.
+
+
+### Considerações Finais
+As dificuldades encontradas ao longo do projeto foram essenciais para compreender as limitações das abordagens mais simples e justificar a evolução para soluções mais integradas e eficientes. Cada desafio contribuiu para uma melhor compreensão do problema de deteção de objetos e para o desenvolvimento de um sistema final mais robusto e adequado a cenários realistas.
+
+
+---
+
+
 
