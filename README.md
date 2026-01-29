@@ -169,3 +169,52 @@ A **Task 2** permitiu criar um dataset sintético robusto e bem caracterizado, e
 
 Este dataset constitui a base experimental para todas as tarefas subsequentes.
 
+---
+
+## Task 3 — Deteção por Janela Deslizante (*Sliding Window*)
+
+### Objetivo
+O objetivo da **Task 3** é implementar um sistema de deteção de dígitos em imagens sintéticas do MNIST recorrendo a uma estratégia de **janela deslizante (*sliding window*)**, reutilizando o classificador treinado na **Task 1**.
+
+### Metodologia
+Foi utilizada uma janela de tamanho fixo (28×28 píxeis) que percorre a imagem de forma exaustiva, com um *stride* configurável.  
+Cada subimagem extraída é normalizada de forma idêntica ao dataset MNIST e classificada através da rede neuronal convolucional treinada na Task 1.
+
+As deteções são filtradas com base em dois critérios principais:
+- **Limiar mínimo de probabilidade** da classe predita (softmax)
+- **Limiar máximo de entropia**, de modo a rejeitar previsões ambíguas
+
+De forma opcional, é aplicada a técnica de **Non-Maximum Suppression (NMS)** para reduzir a redundância causada por *bounding boxes* sobrepostas.
+
+
+### Parâmetros Utilizados
+- **Tamanho da janela:** 28×28  
+- **Stride:** 4 píxeis  
+- **Limiar de confiança:** 0.90–0.95  
+- **Limiar de entropia:** 1.5  
+
+
+### Resultados
+
+**Deteções brutas (sem aplicação de NMS):**  
+![Deteções RAW](Resultados/det_synth_vA_test_000000_w28_s4_p0.95_e1.50_RAW.png)
+
+**Deteções após aplicação de Non-Maximum Suppression:**  
+![Deteções com NMS](Resultados/det_synth_vA_test_000000_w28_s4_p0.95_e1.50_nms0.30.png)
+
+
+### Discussão
+A abordagem de deteção por janela deslizante apresenta várias limitações conhecidas:
+- Elevado custo computacional devido à análise exaustiva da imagem  
+- Grande número de deteções redundantes e sobrepostas  
+- Forte dependência do valor do *stride*  
+- Escalabilidade reduzida para imagens maiores ou com maior densidade de objetos  
+
+Embora a aplicação de **Non-Maximum Suppression** permita reduzir parcialmente a redundância das deteções, o método continua a ser pouco eficiente e inadequado para cenários mais complexos.
+
+Estas limitações motivam a adoção de uma estratégia de deteção mais robusta e eficiente, a qual é explorada na **Task 4**.
+
+A **Task 3** demonstra a aplicabilidade de uma abordagem clássica de deteção baseada em *sliding window*, evidenciando simultaneamente as suas limitações práticas.  
+Esta análise crítica serve de base para a introdução de um detetor melhorado na tarefa seguinte.
+
+
